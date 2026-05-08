@@ -1,0 +1,27 @@
+name: Build LaTeX PDF
+
+on:
+  push:
+    paths:
+      - "**.tex"
+      - ".github/workflows/build-latex-pdf.yml"
+  workflow_dispatch:
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: yoy_sales_growth_python_powerbi.tex
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yoy-sales-growth-python-powerbi-pdf
+          path: yoy_sales_growth_python_powerbi.pdf
