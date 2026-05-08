@@ -1,0 +1,331 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.65in]{geometry}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{titlesec}
+
+\definecolor{DeepNavy}{HTML}{0B1F3A}
+\definecolor{LightBlue}{HTML}{EAF3FF}
+\definecolor{LightGray}{HTML}{F4F6F8}
+\definecolor{CodeBg}{HTML}{F7F7F7}
+\definecolor{DarkGreen}{HTML}{1B6B3A}
+\definecolor{AccentOrange}{HTML}{D97706}
+
+\hypersetup{colorlinks=true, linkcolor=DeepNavy, urlcolor=DeepNavy}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Union Day School}
+\chead{Year-over-Year Sales Growth}
+\rhead{Python + Power BI}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\titleformat{\section}{\Large\bfseries\color{DeepNavy}}{}{0em}{}
+\titleformat{\subsection}{\large\bfseries\color{DeepNavy}}{}{0em}{}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    backgroundcolor=\color{CodeBg},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{DeepNavy}\bfseries,
+    commentstyle=\color{DarkGreen},
+    stringstyle=\color{AccentOrange},
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    rulecolor=\color{gray!40},
+    tabsize=4
+}
+
+\lstdefinelanguage{DAX}{
+  morekeywords={CALCULATE,SUM,DIVIDE,SAMEPERIODLASTYEAR,CALENDAR,MIN,MAX,YEAR,MONTH,FORMAT,IF,BLANK},
+  sensitive=false,
+  morecomment=[l]{//},
+  morestring=[b]"
+}
+\lstdefinestyle{daxstyle}{
+    language=DAX,
+    backgroundcolor=\color{CodeBg},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{DeepNavy}\bfseries,
+    commentstyle=\color{DarkGreen},
+    stringstyle=\color{AccentOrange},
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    rulecolor=\color{gray!40},
+    tabsize=4
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+
+\begin{document}
+
+\begin{center}
+    {\Huge \bfseries \color{DeepNavy} Year-over-Year Sales Growth}\\[4pt]
+    {\Large Using Python and Power BI DAX}\\[6pt]
+    \textbf{Teacher: Nigussie Guluma} \quad | \quad Middle/High School Data Analysis Lesson
+\end{center}
+
+\begin{tcolorbox}[colback=LightBlue,colframe=DeepNavy,title=Learning Goal]
+Students will understand how to calculate, interpret, and compare \textbf{Year-over-Year (YoY) Sales Growth} using two tools: \textbf{Python pandas} and \textbf{Power BI DAX}.
+\end{tcolorbox}
+
+\section{1. What is Year-over-Year Sales Growth?}
+Year-over-Year Sales Growth compares sales from one year to the sales from the previous year. It helps answer this question:
+
+\begin{center}
+\textbf{``Compared to last year, did sales increase or decrease?''}
+\end{center}
+
+\begin{tcolorbox}[colback=LightGray,colframe=DeepNavy,title=Formula]
+\[
+\text{YoY Growth \%} = \frac{\text{Current Year Sales} - \text{Previous Year Sales}}{\text{Previous Year Sales}} \times 100
+\]
+\end{tcolorbox}
+
+\textbf{Interpretation:}
+\begin{itemize}[itemsep=2pt]
+    \item Positive percentage means sales increased.
+    \item Negative percentage means sales decreased.
+    \item Zero percent means sales stayed the same.
+\end{itemize}
+
+\section{2. Sample Sales Data}
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+\textbf{Year} & \textbf{Sales} & \textbf{Meaning} \\
+\midrule
+2021 & \$40,000 & Starting year \\
+2022 & \$46,000 & Sales increased \\
+2023 & \$52,900 & Sales increased again \\
+2024 & \$50,000 & Sales decreased \\
+2025 & \$65,000 & Sales increased strongly \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{3. Manual Example}
+Find the YoY growth from 2024 to 2025.
+
+\[
+\frac{65000 - 50000}{50000} \times 100
+\]
+
+\[
+\frac{15000}{50000} \times 100 = 30\%
+\]
+
+\begin{tcolorbox}[colback=LightBlue,colframe=DeepNavy,title=Conclusion]
+From 2024 to 2025, sales increased by \textbf{30\%}. This means the company sold much more in 2025 than in 2024.
+\end{tcolorbox}
+
+\section{4. Python Method Using pandas}
+Python is useful when students want to calculate sales growth from a table or dataset. The pandas function \texttt{pct\_change()} calculates percent change from one row to the next row.
+
+\subsection{Python Code}
+\begin{lstlisting}[style=pythonstyle]
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Step 1: Create the dataset
+data = {
+    "Year": [2021, 2022, 2023, 2024, 2025],
+    "Sales": [40000, 46000, 52900, 50000, 65000]
+}
+
+df = pd.DataFrame(data)
+
+# Step 2: Calculate previous year sales
+df["Previous Year Sales"] = df["Sales"].shift(1)
+
+# Step 3: Calculate YoY growth amount
+df["YoY Growth"] = df["Sales"] - df["Previous Year Sales"]
+
+# Step 4: Calculate YoY growth percent
+df["YoY Growth %"] = df["Sales"].pct_change() * 100
+
+print(df)
+\end{lstlisting}
+
+\subsection{Expected Python Output}
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Year} & \textbf{Sales} & \textbf{Previous Year Sales} & \textbf{YoY Growth} & \textbf{YoY Growth \%} \\
+\midrule
+2021 & 40,000 & -- & -- & -- \\
+2022 & 46,000 & 40,000 & 6,000 & 15.00\% \\
+2023 & 52,900 & 46,000 & 6,900 & 15.00\% \\
+2024 & 50,000 & 52,900 & -2,900 & -5.48\% \\
+2025 & 65,000 & 50,000 & 15,000 & 30.00\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Python Graph Code}
+\begin{lstlisting}[style=pythonstyle]
+# Bar graph for total sales by year
+plt.figure(figsize=(8, 5))
+plt.bar(df["Year"], df["Sales"])
+plt.title("Total Sales by Year")
+plt.xlabel("Year")
+plt.ylabel("Sales")
+plt.show()
+
+# Line graph for YoY Growth Percentage
+plt.figure(figsize=(8, 5))
+plt.plot(df["Year"], df["YoY Growth %"], marker="o")
+plt.title("Year-over-Year Sales Growth %")
+plt.xlabel("Year")
+plt.ylabel("YoY Growth %")
+plt.axhline(0, linestyle="--")
+plt.show()
+\end{lstlisting}
+
+\begin{tcolorbox}[colback=LightGray,colframe=DeepNavy,title=Python Explanation]
+\texttt{shift(1)} moves the sales values down one row so each year can be compared with the previous year. \texttt{pct\_change()} calculates the percentage change automatically.
+\end{tcolorbox}
+
+\newpage
+\section{5. Power BI Method Using DAX}
+Power BI is useful when students want to build dashboards and interactive reports. DAX measures calculate values dynamically based on filters, slicers, and visuals.
+
+\subsection{Data Model Requirement}
+For YoY DAX calculations to work correctly, use a proper Date Table.
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Table} & \textbf{Column} \\
+\midrule
+Sales & Sales[SalesAmount] \\
+Sales & Sales[Date] \\
+Calendar & Calendar[Date] \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Create a relationship:
+\begin{center}
+\textbf{Calendar[Date]  $\rightarrow$  Sales[Date]}
+\end{center}
+
+\subsection{Create a Date Table in DAX}
+\begin{lstlisting}[style=daxstyle]
+Calendar =
+CALENDAR(
+    MIN(Sales[Date]),
+    MAX(Sales[Date])
+)
+\end{lstlisting}
+
+Add useful columns:
+\begin{lstlisting}[style=daxstyle]
+Year = YEAR(Calendar[Date])
+Month = FORMAT(Calendar[Date], "MMMM")
+Month Number = MONTH(Calendar[Date])
+\end{lstlisting}
+
+\subsection{DAX Measures}
+\textbf{Measure 1: Total Sales}
+\begin{lstlisting}[style=daxstyle]
+Total Sales =
+SUM(Sales[SalesAmount])
+\end{lstlisting}
+
+\textbf{Measure 2: Previous Year Sales}
+\begin{lstlisting}[style=daxstyle]
+Sales Previous Year =
+CALCULATE(
+    [Total Sales],
+    SAMEPERIODLASTYEAR(Calendar[Date])
+)
+\end{lstlisting}
+
+\textbf{Measure 3: YoY Sales Growth Amount}
+\begin{lstlisting}[style=daxstyle]
+YoY Sales Growth =
+[Total Sales] - [Sales Previous Year]
+\end{lstlisting}
+
+\textbf{Measure 4: YoY Sales Growth Percentage}
+\begin{lstlisting}[style=daxstyle]
+YoY Sales Growth % =
+DIVIDE(
+    [YoY Sales Growth],
+    [Sales Previous Year],
+    0
+)
+\end{lstlisting}
+
+Format \textbf{YoY Sales Growth \%} as a percentage in Power BI.
+
+\section{6. Python vs. Power BI Comparison}
+\begin{center}
+\begin{tabular}{p{0.3\textwidth}p{0.3\textwidth}p{0.3\textwidth}}
+\toprule
+\textbf{Question} & \textbf{Python} & \textbf{Power BI} \\
+\midrule
+Best use & Data analysis and coding practice & Dashboard and business reporting \\
+Main tool & pandas & DAX measures \\
+Formula method & \texttt{pct\_change()} or manual formula & \texttt{SAMEPERIODLASTYEAR()} and \texttt{DIVIDE()} \\
+Output & DataFrame, graphs, calculations & Interactive tables, charts, slicers \\
+Good for students because & They see how the calculation is built step by step & They learn business intelligence reporting \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{7. Student Practice}
+Use the following data to answer the questions.
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+\textbf{Year} & \textbf{Sales} \\
+\midrule
+2020 & \$35,000 \\
+2021 & \$40,000 \\
+2022 & \$46,000 \\
+2023 & \$52,900 \\
+2024 & \$50,000 \\
+2025 & \$65,000 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[itemsep=4pt]
+    \item Calculate the YoY growth amount from 2020 to 2021.
+    \item Calculate the YoY growth percentage from 2021 to 2022.
+    \item Which year had negative growth?
+    \item Which year had the highest growth percentage?
+    \item In Python, which function can calculate percent change automatically?
+    \item In DAX, which function returns sales from the previous year?
+    \item Explain in one sentence why YoY growth is useful for a business.
+\end{enumerate}
+
+\section{8. Exit Ticket}
+\begin{enumerate}[itemsep=4pt]
+    \item What does YoY stand for?
+    \item Write the formula for YoY Growth \%.
+    \item If sales increased from \$80,000 to \$100,000, what is the YoY Growth \%?
+    \item Which tool is better for dashboards: Python or Power BI?
+    \item Which tool is better for writing code and practicing data analysis: Python or Power BI?
+\end{enumerate}
+
+\begin{tcolorbox}[colback=LightBlue,colframe=DeepNavy,title=Teacher Note]
+Both Python and Power BI use the same mathematical idea. Python helps students understand the calculation through code. Power BI helps students communicate results through dashboards and business reports.
+\end{tcolorbox}
+
+\end{document}
